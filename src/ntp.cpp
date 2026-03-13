@@ -15,7 +15,7 @@ void initNTP() {
 
   timeClient.begin();
 
-  Serial.println("NTP & WiFi Initialized");
+  Serial.println("NTP Initialized");
 }
 
 bool updateNTP(long& epoch) {

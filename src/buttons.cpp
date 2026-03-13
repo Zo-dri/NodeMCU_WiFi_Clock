@@ -5,6 +5,7 @@
 
 #define HOLD_DELAY 600
 #define REPEAT_RATE 120
+#define DEBOUNCE_TIME 100
 
 Button readButton() {
   static Button lastButton = BTN_NONE;
@@ -44,6 +45,57 @@ Button readButtonRaw() {
   return BTN_NONE;
 }
 
+Button getButtonEvent()
+{
+  static Button stableButton = BTN_NONE;
+  static Button lastReading = BTN_NONE;
+
+  static unsigned long debounceTimer = 0;
+  static unsigned long pressTime = 0;
+  static unsigned long repeatTimer = 0;
+
+  Button reading = readButtonRaw();
+  unsigned long now = millis();
+
+  // reading changed → start debounce timer
+  if (reading != lastReading)
+  {
+    debounceTimer = now;
+    lastReading = reading;
+  }
+
+  // wait until stable
+  if (now - debounceTimer > DEBOUNCE_TIME)
+  {
+    if (reading != stableButton)
+    {
+      stableButton = reading;
+
+      if (stableButton != BTN_NONE)
+      {
+        pressTime = now;
+        repeatTimer = now;
+        return stableButton; // new press
+      }
+    }
+  }
+
+  // handle hold repeat
+  if (stableButton != BTN_NONE)
+  {
+    if (now - pressTime > HOLD_DELAY)
+    {
+      if (now - repeatTimer > REPEAT_RATE)
+      {
+        repeatTimer = now;
+        return stableButton;
+      }
+    }
+  }
+
+  return BTN_NONE;
+}
+/*
 Button getButtonEvent() {
   static Button lastButton = BTN_NONE;
   static unsigned long pressTime = 0;
@@ -74,4 +126,19 @@ Button getButtonEvent() {
   }
 
   return BTN_NONE;
+}
+*/
+void printButtonState(Button b)
+{
+  if (b == BTN_UP)
+    Serial.println("UP");
+
+  if (b == BTN_DOWN)
+    Serial.println("DOWN");
+
+  if (b == BTN_SELECT)
+    Serial.println("SELECT");
+
+  if (b == BTN_BACK)
+    Serial.println("BACK");
 }

@@ -1,10 +1,10 @@
-#include "WString.h"
-#include "menu.h"
+#include <RTClib.h>
 #include "buttons.h"
 #include "display.h"
-#include <RTClib.h>
+#include "menu.h"
 #include "rtc.h"
 #include "wifi.h"
+#include "WString.h"
 
 MenuState state = CLOCK_VIEW;
 MenuState lastState = MAIN_MENU;
@@ -49,40 +49,77 @@ String printStatePretty() {
       case RESET_WIFI:
         Serial.print("RESET_WIFI");
         return "RESET_WIFI";
-    }
+      case SET_WIFI:
+        Serial.print("SET_WIFI");
+        return "SET_WIFI";
+      }
   }
   return "UNCHANGED";
 }
-void printStatePretty(byte n) {
-  n = 0;  // to avoid unused warning
+String getStatePretty()
+{
   if (state != lastState) {
     lastState = state;
     Serial.print("State: ");
     switch (state) {
       case CLOCK_VIEW:
-        Serial.print("CLOCK_VIEW");
-        break;
+        return "CLOCK_VIEW";
       case MAIN_MENU:
-        Serial.print("MAIN_MENU");
-        break;
+        return "MAIN_MENU";
       case SET_HOUR:
-        Serial.print("SET_HOUR");
-        break;
+        return "SET_HOUR";
       case SET_MINUTE:
-        Serial.print("SET_MINUTE");
-        break;
+        return "SET_MINUTE";
       case SET_DAY:
-        Serial.print("SET_DAY");
-        break;
+        return "SET_DAY";
       case SET_MONTH:
-        Serial.print("SET_MONTH");
-        break;
+        return "SET_MONTH";
       case SET_YEAR:
-        Serial.print("SET_YEAR");
-        break;
+        return "SET_YEAR";
       case RESET_WIFI:
-        Serial.print("RESET_WIFI");
-        break;
+        return "RESET_WIFI";
+      case SET_WIFI:
+        return "SET_WIFI";
+      }
+  }
+  return "UNCHANGED";
+}
+void printStatePretty(char n)
+{
+  n = 0; // to avoid unused warning
+  if (state != lastState)
+  {
+    lastState = state;
+    Serial.print("State: ");
+    switch (state)
+    {
+    case CLOCK_VIEW:
+      Serial.print("CLOCK_VIEW");
+      break;
+    case MAIN_MENU:
+      Serial.print("MAIN_MENU");
+      break;
+    case SET_HOUR:
+      Serial.print("SET_HOUR");
+      break;
+    case SET_MINUTE:
+      Serial.print("SET_MINUTE");
+      break;
+    case SET_DAY:
+      Serial.print("SET_DAY");
+      break;
+    case SET_MONTH:
+      Serial.print("SET_MONTH");
+      break;
+    case SET_YEAR:
+      Serial.print("SET_YEAR");
+      break;
+    case RESET_WIFI:
+      Serial.print("RESET_WIFI");
+      break;
+    case SET_WIFI:
+      Serial.print("SET_WIFI");
+      break;
     }
   }
 }
@@ -104,9 +141,11 @@ void runMenu() {
   updateBlink();
   Button b = getButtonEvent();
 
+  printButtonState(b);
+
   int h, m, s, d, mo, y;
 
-  printStatePretty(0);
+  // printStatePretty(0);
 
   switch (state) {
 
@@ -144,8 +183,10 @@ void runMenu() {
       if (b == BTN_UP) menuIndex--;
       if (b == BTN_DOWN) menuIndex++;
 
-      if (menuIndex < 0) menuIndex = 2;
-      if (menuIndex > 2) menuIndex = 0;
+      if (menuIndex < 0)
+        menuIndex = 3;
+      if (menuIndex > 3)
+        menuIndex = 0;
 
       if (b == BTN_SELECT) {
         switch (menuIndex) {
@@ -157,6 +198,9 @@ void runMenu() {
             state = SET_DAY;
             break;
           case 2:
+            state = SET_WIFI;
+            break;
+          case 3:
             state = RESET_WIFI;
           default:
             break;
@@ -181,18 +225,7 @@ void runMenu() {
         default:
           break;
       }
-      // }
-      // else {
-      //   switch (menuIndex) {
-      //     case 0:
-      //       clearTime();
-      //       break;
-      //     case 1:
-      //       break;
-      //     default:
-      //       break;
-      //   }
-      // }
+
       break;
 
     case SET_HOUR:
@@ -203,12 +236,8 @@ void runMenu() {
       if (b == BTN_SELECT) state = SET_MINUTE;
       if (b == BTN_BACK) state = MAIN_MENU;
 
-      showTimeEdit(editHour, editMinute, 1, blinkState);
-      // if (blinkState)
-      //   showTime(editHour, editMinute, s, true);
-      // else
-      //   // showTime(99, 99, s, false);  // blank
-      //   clearTime(0);  // Clear Hour
+      showTimeEdit(editHour, editMinute, 0, blinkState);
+      // showTimeEdit(editHour, editMinute, 1, blinkState);
       break;
 
     case SET_MINUTE:
@@ -225,12 +254,9 @@ void runMenu() {
       }
 
       if (b == BTN_BACK) state = MAIN_MENU;
-      showTimeEdit(editHour, editMinute, 3, blinkState);
-      // if (blinkState)
-      //   showTime(editHour, editMinute, s, true);
-      // else
-      //   // showTime(99, 99, s, false);
-      //   clearTime(1);  // Clear Minute
+
+      showTimeEdit(editHour, editMinute, 2, blinkState);
+      // showTimeEdit(editHour, editMinute, 3, blinkState);
       break;
 
     case SET_DAY:
@@ -245,7 +271,7 @@ void runMenu() {
       if (b == BTN_BACK) state = MAIN_MENU;
 
       // showDate(editDay, 1, 0);
-      showDateEdit(editDay, editMonth, editYear, 1, blinkState);
+      showDateEdit(editDay, editMonth, editYear, 0, blinkState);
 
       break;
 
@@ -262,7 +288,7 @@ void runMenu() {
       if (b == BTN_BACK) state = MAIN_MENU;
 
       // showDate(editDay, editMonth, 0);
-      showDateEdit(editDay, editMonth, editYear, 3, blinkState);
+      showDateEdit(editDay, editMonth, editYear, 2, blinkState);
 
       break;
 
@@ -286,8 +312,12 @@ void runMenu() {
       if (b == BTN_BACK) state = MAIN_MENU;
 
       // showDate(editDay, editMonth, editYear);
-      showDateEdit(editDay, editMonth, editYear, 5, blinkState);
+      showDateEdit(editDay, editMonth, editYear, 4, blinkState);
 
+      break;
+    case SET_WIFI:
+      useWiFi();
+      state = CLOCK_VIEW;
       break;
     case RESET_WIFI:
       resetWifi();

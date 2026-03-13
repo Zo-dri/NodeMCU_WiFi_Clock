@@ -95,7 +95,7 @@ void showTimeEdit(int h, int m, int blinkDigit, bool blinkState) {
   };
 
   for (int i = 0; i < 4; i++) {
-    if (i == blinkDigit && !blinkState)
+    if ((i == blinkDigit || i == blinkDigit + 1) && !blinkState)
       timeDisplay.setChar(0, i, ' ', false);
     else
       timeDisplay.setDigit(0, i, digits[i], false);
@@ -114,7 +114,7 @@ void showDateEdit(int d, int m, int y, int blinkDigit, bool blinkState) {
   };
 
   for (int i = 0; i < 6; i++) {
-    if (i == blinkDigit && !blinkState)
+    if ((i == blinkDigit || i == blinkDigit + 1) && !blinkState)
       dateDisplay.setChar(0, i, ' ', false);
     else
       dateDisplay.setDigit(0, i, digits[i], false);
@@ -149,4 +149,8 @@ void scrollingDot() {
       dateDisplay.setChar(0, 5, '.', false);
       break;
   }
+}
+
+void setwifi(){
+  // timeDisplay.setChar(0, 0, '')
 }

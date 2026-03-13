@@ -13,5 +13,6 @@ enum Button
 Button readButton();
 Button readButtonRaw();
 Button getButtonEvent();
+void printButtonState(Button b);
 
 #endif
