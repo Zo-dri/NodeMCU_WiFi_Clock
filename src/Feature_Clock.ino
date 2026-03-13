@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "display.h"
 #include "rtc.h"
 #include "ntp.h"

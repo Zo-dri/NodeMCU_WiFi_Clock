@@ -46,6 +46,9 @@ String printStatePretty() {
       case SET_YEAR:
         Serial.print("SET_YEAR");
         return "SET_YEAR";
+      case RESET_WIFI:
+        Serial.print("RESET_WIFI");
+        return "RESET_WIFI";
     }
   }
   return "UNCHANGED";
@@ -76,6 +79,9 @@ void printStatePretty(byte n) {
         break;
       case SET_YEAR:
         Serial.print("SET_YEAR");
+        break;
+      case RESET_WIFI:
+        Serial.print("RESET_WIFI");
         break;
     }
   }
