@@ -41,6 +41,7 @@ void initDisplay() {
 
 void showTime(int h, int m, int s, bool colon) {
   // prettyPrintTime(h, m, s);
+  bool am_PM = (h > 11 || h == 0);
   bool use24H = get24H();
   if (!use24H)
   {
@@ -49,7 +50,6 @@ void showTime(int h, int m, int s, bool colon) {
     else if (h > 12)
       h -= 12;
   }
-  bool am_PM = (h > 11 || h == 0);
 
   timeDisplay.setDigit(0, 0, h / 10, (use24H) ? false : am_PM);
   timeDisplay.setDigit(0, 1, h % 10, colon);
@@ -209,26 +209,113 @@ void setBrightDisplay(int value, bool blinkState)
   timeDisplay.setDigit(0,3, digits[1], false );
   clearDate();
 }
-#define segment(seg) (((int)seg) - 96)
-void setDateDisplay(int index){
-  // dateDisplay.setChar()
-  dateDisplay.setLed(0, index, segment('a'), 0);
-  dateDisplay.setLed(0, index, segment('b'), 0);
-  dateDisplay.setLed(0, index, segment('c'), 0);
-  dateDisplay.setLed(0, index, segment('d'), 0);
-  dateDisplay.setLed(0, index, segment('e'), 1);
-  dateDisplay.setLed(0, index, segment('f'), 0);
-  dateDisplay.setLed(0, index, segment('g'), 1);
 
+/**
+ * Converts the given character to a segment index.
+ *
+ * Params:
+ * (char)seg: segment name
+ * Available values 'a', 'b', 'c', 'd', 'e', 'f', 'g'
+ *
+ * To be used with setChar
+ * Example:
+ * display.setchar(0, 0, segment('a'), false);
+ */
+#define segment(seg) (((int)seg) - 96)
+
+byte alphabets[27] = {
+    0b11101110, // A
+    0b00111110, // b
+    0b10011100, // C
+    0b01111010, // d
+    0b10011110, // E
+    0b10001110, // F
+    0b10111100, // G
+    0b01101110, // H
+    0b00100000, // I
+    0b01111000, // J
+    0b00000000, // K
+    0b00011100, // L
+    0b00000000, // M
+    0b00101010, // n
+    0b00111010, // o
+    0b11001110, // P
+    0b11100110, // Q
+    0b00001010, // r
+    0b10110110, // S
+    0b00011110, // t
+    0b00111000, // u
+    0b00000000, // V
+    0b00000000, // W
+    0b00000000, // X
+    0b01110110, // Y
+    0b11011010, // Z
+    0b00000000};
+
+/**
+ * Display the english alphabet in a 7-segment display.
+ * 
+ * Params
+ * index: position of the character in the display (0...7)
+ * value: the character to display
+ */
+void setCharacterTime(int index, char value)
+{
+  byte characterByte;
+  if (value == ' ')
+  {
+    characterByte = alphabets[26];
+  }
+  else
+  {
+    characterByte = alphabets[(int)value - 97];
+  }
+  for (int i = 1; i <= 7; i++)
+  {
+    bool characterBit = (characterByte & (1 << (8 - i))) > 0;
+    timeDisplay.setLed(0, index, i, characterBit);
+  }
+}
+void setCharacterDate(int index, char value)
+{
+  byte characterByte;
+  if (value == ' ')
+  {
+    characterByte = alphabets[26];
+  }
+  else
+  {
+    characterByte = alphabets[(int)value - 97];
+  }
+  for (int i = 1; i <= 7; i++)
+  {
+    bool characterBit = (characterByte & (1 << (8 - i))) > 0;
+    dateDisplay.setLed(0, index, i, characterBit);
+  }
+}
+
+void setTimeDisplay(String displayString)
+{
+  byte iterate = displayString.length();
+  iterate = constrain(iterate, 0, 4);
+  for (int i = 0; i < iterate; i++)
+  {
+    setCharacterTime(i, displayString.charAt(i));
+  }
+}
+void setDateDisplay(String displayString)
+{
+  byte iterate = displayString.length();
+  iterate = constrain(iterate, 0, 6);
+  for (int i = 0; i < iterate; i++)
+  {
+    setCharacterDate(i, displayString.charAt(i));
+  }
 }
 void setWifiDisplay(int value)
 {
-  clearTime();
-  // dateDisplay.setChar(0, 0, ' ', false);
-  setDateDisplay(0);
-  dateDisplay.setChar(0, 1, 'E', false);
-  dateDisplay.setChar(0, 2, ' ', false);
-  dateDisplay.setChar(0, 3, 'E', false);
-  dateDisplay.setChar(0, 4, ' ', false);
+  // clearTime();
+  setTimeDisplay("ap  ");
+  setDateDisplay("reset");
   dateDisplay.setDigit(0, 5, value, false);
 }

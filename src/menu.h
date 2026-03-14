@@ -19,6 +19,8 @@ enum MenuState
 
 MenuState getState();
 int getCustomBrightness();
+int setCustomBrightness(int level);
+
 bool get24H();
 void initMenu();
 void runMenu();

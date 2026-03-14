@@ -153,6 +153,12 @@ int getCustomBrightness()
 {
   return useBrightness;
 }
+int setCustomBrightness(int level)
+{
+  useBrightness = level;
+  return useBrightness;
+}
+
 void initMenu() {}
 
 void updateBlink() {

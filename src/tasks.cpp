@@ -67,7 +67,7 @@ void runBrightnessTask()
         tBrightness = millis();
 
         if (h >= 22 || h < 7)
-            setBrightness(2); // night mode
+            setBrightness(setCustomBrightness(2)); // night mode
         else
             setBrightness(getCustomBrightness()); // daytime
     }
