@@ -17,5 +17,6 @@ void scrollingDot();
 
 void set24H(int display, bool blinkState);
 void setBrightDisplay(int value, bool blinkState);
+void setWifiDisplay(int value);
 
 #endif

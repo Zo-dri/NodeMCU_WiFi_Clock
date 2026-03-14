@@ -19,11 +19,11 @@ String MenuStateName[Num_MenuState] = {"CLOCK_VIEW", "MAIN_MENU", "SET_HOUR",
 
 int menuIndex = 0;
 
-int editHour;
-int editMinute;
-int editDay;
-int editMonth;
-int editYear;
+int editHour, lastEditHour;
+int editMinute, lastEditMinute;
+int editDay, lastEditDay;
+int editMonth, lastEditMonth;
+int editYear, lastEditYear;
 
 unsigned long blinkTimer = 0;
 bool blinkState = true;
@@ -182,11 +182,11 @@ void runMenu() {
 
       getTime(h, m, s);
       getDate(d, mo, y);
-      editHour = h;
-      editMinute = m;
-      editDay = d;
-      editMonth = mo;
-      editYear = y;
+      editHour = h, lastEditHour = editHour;
+      editMinute = m, lastEditMinute = editMinute;
+      editDay = d, lastEditDay = editDay;
+      editMonth = mo, lastEditMonth = editMonth;
+      editYear = y, lastEditYear = editYear;
       edit24H = use24H;
       editBrightness = useBrightness;
       Serial.println();
@@ -261,8 +261,10 @@ void runMenu() {
         {
           clearTime();
         }
+        showDate(editDay, editMonth, editYear);
         break;
       case 1:
+      showTime(editHour, editMinute, 0, true);
         if (blinkState)
         {
           showDate(editDay, editMonth, editYear);
@@ -277,6 +279,13 @@ void runMenu() {
         break;
       case 3:
         setBrightDisplay(editBrightness, blinkState);
+        break;
+      case 4:
+        setWifiDisplay(0);
+        break;
+      case 5:
+        setWifiDisplay(1);
+        break;
       default:
         break;
       }
@@ -294,10 +303,13 @@ void runMenu() {
       if (b == BTN_SELECT)
         state = SET_MINUTE;
       if (b == BTN_BACK)
+      {
+        editHour = h;
         state = MAIN_MENU;
+      }
 
       showTimeEdit(editHour, editMinute, 0, blinkState);
-      // showTimeEdit(editHour, editMinute, 1, blinkState);
+      showDate(editDay, editMonth, editYear);
       break;
     }
     case SET_MINUTE:
@@ -313,14 +325,18 @@ void runMenu() {
         getDate(d, mo, y);
 
         setRTC(DateTime(y, mo, d, editHour, editMinute, 0).unixtime());
-        state = CLOCK_VIEW;
+        menuIndex = 0;
+        state = MAIN_MENU;
       }
 
       if (b == BTN_BACK)
+      {
+        editMinute = m;
         state = MAIN_MENU;
+      }
 
       showTimeEdit(editHour, editMinute, 2, blinkState);
-      // showTimeEdit(editHour, editMinute, 3, blinkState);
+      showDate(editDay, editMonth, editYear);
       break;
     }
     case SET_DAY:
@@ -338,9 +354,13 @@ void runMenu() {
       if (b == BTN_SELECT)
         state = SET_MONTH;
       if (b == BTN_BACK)
+      {
+        editDay = lastEditDay;
         state = MAIN_MENU;
+      }
 
       // showDate(editDay, 1, 0);
+      showTime(editHour, editMinute, 0, true);
       showDateEdit(editDay, editMonth, editYear, 0, blinkState);
 
       break;
@@ -360,9 +380,12 @@ void runMenu() {
       if (b == BTN_SELECT)
         state = SET_YEAR;
       if (b == BTN_BACK)
+      {
+        editMonth = lastEditMonth;
         state = MAIN_MENU;
+      }
 
-      // showDate(editDay, editMonth, 0);
+      showTime(editHour, editMinute, 0, true);
       showDateEdit(editDay, editMonth, editYear, 2, blinkState);
 
       break;
@@ -385,13 +408,17 @@ void runMenu() {
         getTime(h, m, s);
 
         setRTC(DateTime(editYear, editMonth, editDay, h, m, s).unixtime());
-        state = CLOCK_VIEW;
+        state = MAIN_MENU;
       }
 
       if (b == BTN_BACK)
+      {
+        editYear = lastEditYear;
+        menuIndex = 1;
         state = MAIN_MENU;
+      }
 
-      // showDate(editDay, editMonth, editYear);
+      showTime(editHour, editMinute, 0, true);
       showDateEdit(editDay, editMonth, editYear, 4, blinkState);
 
       break;
@@ -454,6 +481,7 @@ void runMenu() {
     case RESET_WIFI:
     {
       resetWifi();
+      initWiFi();
       break;
     }
     }

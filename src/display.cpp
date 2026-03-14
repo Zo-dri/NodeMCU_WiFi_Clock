@@ -207,4 +207,28 @@ void setBrightDisplay(int value, bool blinkState)
   timeDisplay.setChar(0, 1, ' ', false);
   timeDisplay.setDigit(0, 2, digits[0], false);
   timeDisplay.setDigit(0,3, digits[1], false );
+  clearDate();
+}
+#define segment(seg) (((int)seg) - 96)
+void setDateDisplay(int index){
+  // dateDisplay.setChar()
+  dateDisplay.setLed(0, index, segment('a'), 0);
+  dateDisplay.setLed(0, index, segment('b'), 0);
+  dateDisplay.setLed(0, index, segment('c'), 0);
+  dateDisplay.setLed(0, index, segment('d'), 0);
+  dateDisplay.setLed(0, index, segment('e'), 1);
+  dateDisplay.setLed(0, index, segment('f'), 0);
+  dateDisplay.setLed(0, index, segment('g'), 1);
+
+}
+void setWifiDisplay(int value)
+{
+  clearTime();
+  // dateDisplay.setChar(0, 0, ' ', false);
+  setDateDisplay(0);
+  dateDisplay.setChar(0, 1, 'E', false);
+  dateDisplay.setChar(0, 2, ' ', false);
+  dateDisplay.setChar(0, 3, 'E', false);
+  dateDisplay.setChar(0, 4, ' ', false);
+  dateDisplay.setDigit(0, 5, value, false);
 }
