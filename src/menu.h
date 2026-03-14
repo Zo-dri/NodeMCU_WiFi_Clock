@@ -11,12 +11,14 @@ enum MenuState
   SET_MONTH,
   SET_YEAR,
   H24_SET,
+  SET_BRIGHT,
   SET_WIFI,
   RESET_WIFI,
   Num_MenuState
 };
 
 MenuState getState();
+int getCustomBrightness();
 bool get24H();
 void initMenu();
 void runMenu();

@@ -174,7 +174,7 @@ void set24H(int display, bool blinkState)
     clearTime();
     return;
   }
-  
+
   String hourString;
   if (display)
   {
@@ -189,4 +189,22 @@ void set24H(int display, bool blinkState)
     timeDisplay.setChar(0, i, hourString.charAt(i), false);
   }
   clearDate();
+}
+void setBrightDisplay(int value, bool blinkState)
+{
+  int digits[2] = {
+      value / 10,
+      value % 10,
+  };
+  if (!blinkState)
+  {
+    clearDate();
+    clearTime();
+    return;
+  }
+
+  timeDisplay.setChar(0, 0, 'B', false);
+  timeDisplay.setChar(0, 1, ' ', false);
+  timeDisplay.setDigit(0, 2, digits[0], false);
+  timeDisplay.setDigit(0,3, digits[1], false );
 }

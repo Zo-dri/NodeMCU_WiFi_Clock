@@ -11,8 +11,11 @@ MenuState lastState = MAIN_MENU;
 
 String MenuStateName[Num_MenuState] = {"CLOCK_VIEW", "MAIN_MENU", "SET_HOUR",
                                        "SET_MINUTE", "SET_DAY", "SET_MONTH",
-                                       "SET_YEAR", "H24_SET", "SET_WIFI",
-                                       "RESET_WIFI"};
+                                       "SET_YEAR", "H24_SET", "SET_BRIGHT",
+                                       "SET_WIFI", "RESET_WIFI"};
+
+// Loops from high to low on overflow and vice-versa
+#define loopValue(amt, low, high) ((amt) < (low) ? (high) : ((amt) > (high) ? (low) : (amt)))
 
 int menuIndex = 0;
 
@@ -27,6 +30,9 @@ bool blinkState = true;
 
 bool use24H = false;
 bool edit24H = false;
+
+int useBrightness = 8;
+int editBrightness;
 
 String printStatePretty() {
   if (state != lastState) {
@@ -143,6 +149,10 @@ bool get24H()
 {
   return use24H;
 }
+int getCustomBrightness()
+{
+  return useBrightness;
+}
 void initMenu() {}
 
 void updateBlink() {
@@ -166,7 +176,6 @@ void runMenu() {
   {
   case CLOCK_VIEW:
   {
-
     if (b == BTN_SELECT)
     {
       menuIndex = 0;
@@ -179,6 +188,7 @@ void runMenu() {
       editMonth = mo;
       editYear = y;
       edit24H = use24H;
+      editBrightness = useBrightness;
       Serial.println();
       Serial.print(editHour);
       Serial.print(":");
@@ -196,78 +206,83 @@ void runMenu() {
     break;
   }
 
-  case MAIN_MENU:
-  {
-    if (b == BTN_UP)
-      menuIndex--;
-    if (b == BTN_DOWN)
-      menuIndex++;
-
-    // menuIndex = constrain(menuIndex, 0, 4);
-    if (menuIndex < 0)
-      menuIndex = 4;
-    if (menuIndex > 4)
-      menuIndex = 0;
-
-    if (b == BTN_BACK)
+    case MAIN_MENU:
     {
-      state = CLOCK_VIEW;
-    }
-    if (b == BTN_SELECT)
-    {
+      if (b == BTN_UP)
+        menuIndex--;
+      if (b == BTN_DOWN)
+        menuIndex++;
+
+      menuIndex = loopValue(menuIndex, 0, 5);
+      // if (menuIndex < 0)
+      //   menuIndex = 5;
+      // if (menuIndex > 5)
+      //   menuIndex = 0;
+
+      if (b == BTN_BACK)
+      {
+        state = CLOCK_VIEW;
+      }
+      if (b == BTN_SELECT)
+      {
+        switch (menuIndex)
+        {
+        case 0:
+          state = SET_HOUR;
+          break;
+
+        case 1:
+          state = SET_DAY;
+          break;
+        case 2:
+          state = H24_SET;
+          break;
+        case 3:
+          state = SET_BRIGHT;
+          break;
+        case 4:
+          state = SET_WIFI;
+          break;
+        case 5:
+          state = RESET_WIFI;
+        default:
+          break;
+        }
+      }
+
       switch (menuIndex)
       {
       case 0:
-        state = SET_HOUR;
+        if (blinkState)
+        {
+          showTime(editHour, editMinute, 0, true);
+        }
+        else
+        {
+          clearTime();
+        }
         break;
-
       case 1:
-        state = SET_DAY;
+        if (blinkState)
+        {
+          showDate(editDay, editMonth, editYear);
+        }
+        else
+        {
+          clearDate();
+        }
         break;
       case 2:
-        state = H24_SET;
+        set24H(edit24H, blinkState);
         break;
       case 3:
-        state = SET_WIFI;
-        break;
-      case 4:
-        state = RESET_WIFI;
+        setBrightDisplay(editBrightness, blinkState);
       default:
         break;
       }
-    }
 
-    switch (menuIndex)
-    {
-    case 0:
-      if (blinkState)
-      {
-        showTime(editHour, editMinute, 0, true);
-      }
-      else
-      {
-        clearTime();
-      }
-      break;
-    case 1:
-      if (blinkState)
-      {
-        showDate(editDay, editMonth, editYear);
-      }
-      else
-      {
-        clearDate();
-      }
-      break;
-    case 2:
-      set24H(edit24H, blinkState);
-      break;
-    default:
       break;
     }
-
-    break;
-  }
 
     case SET_HOUR:
     {
@@ -401,6 +416,33 @@ void runMenu() {
         state = MAIN_MENU;
       }
       set24H(edit24H, true);
+      break;
+    }
+    case SET_BRIGHT:
+    {
+      if (b == BTN_UP)
+      {
+        editBrightness++;
+      }
+      if (b == BTN_DOWN)
+      {
+        editBrightness--;
+      }
+      if (b == BTN_SELECT)
+      {
+        useBrightness = editBrightness;
+        menuIndex = 3;
+        state = MAIN_MENU;
+      }
+      if (b == BTN_BACK)
+      {
+        editBrightness = useBrightness;
+        menuIndex = 3;
+        state = MAIN_MENU;
+      }
+      editBrightness = constrain(editBrightness, 1, 15);
+      setBrightness(editBrightness);
+      setBrightDisplay(editBrightness, true);
       break;
     }
     case SET_WIFI:
