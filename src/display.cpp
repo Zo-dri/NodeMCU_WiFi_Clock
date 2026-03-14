@@ -1,5 +1,6 @@
 #include <LedControl.h>
 #include "display.h"
+#include "menu.h"
 
 #define DIN D8
 #define CLK D7
@@ -40,13 +41,21 @@ void initDisplay() {
 
 void showTime(int h, int m, int s, bool colon) {
   // prettyPrintTime(h, m, s);
+  bool use24H = get24H();
+  if (!use24H)
+  {
+    if (h == 0)
+      h = 12;
+    else if (h > 12)
+      h -= 12;
+  }
   bool am_PM = (h > 11 || h == 0);
 
-  timeDisplay.setDigit(0, 0, h / 10, am_PM);
+  timeDisplay.setDigit(0, 0, h / 10, (use24H) ? false : am_PM);
   timeDisplay.setDigit(0, 1, h % 10, colon);
 
   timeDisplay.setDigit(0, 2, m / 10, colon);
-  timeDisplay.setDigit(0, 3, m % 10, !am_PM);
+  timeDisplay.setDigit(0, 3, m % 10, (use24H) ? false : !am_PM);
 }
 void showDate(int d, int m, int y) {
   y = y % 100;
@@ -153,4 +162,31 @@ void scrollingDot() {
 
 void setwifi(){
   // timeDisplay.setChar(0, 0, '')
+}
+
+void set24H(int display, bool blinkState)
+{
+  display = constrain(display, 0, 1);
+
+  if (!blinkState)
+  {
+    clearDate();
+    clearTime();
+    return;
+  }
+  
+  String hourString;
+  if (display)
+  {
+    hourString = "24H ";
+  }
+  else
+  {
+    hourString = "12H ";
+  }
+  for (int i = 0; i < 4; i++)
+  {
+    timeDisplay.setChar(0, i, hourString.charAt(i), false);
+  }
+  clearDate();
 }

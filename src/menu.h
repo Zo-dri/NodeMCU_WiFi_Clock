@@ -10,11 +10,14 @@ enum MenuState
   SET_DAY,
   SET_MONTH,
   SET_YEAR,
+  H24_SET,
   SET_WIFI,
-  RESET_WIFI
+  RESET_WIFI,
+  Num_MenuState
 };
 
 MenuState getState();
+bool get24H();
 void initMenu();
 void runMenu();
 String printStatePretty();

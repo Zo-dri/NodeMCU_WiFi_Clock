@@ -15,4 +15,6 @@ void showDateEdit(int d, int m, int y, int blinkDigit, bool blinkState);
 
 void scrollingDot();
 
+void set24H(int display, bool blinkState);
+
 #endif
