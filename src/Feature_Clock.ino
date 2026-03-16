@@ -35,7 +35,7 @@ void loop() {
   }
   runRTCTask();
   runDisplayTask();
-  // runBuzzerTask();
+  runBuzzerTask();
   runBrightnessTask();
   runButtonTask();
   runMenu();

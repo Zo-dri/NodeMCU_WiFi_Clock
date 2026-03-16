@@ -147,11 +147,17 @@ void showDateEdit(int d, int m, int y, int blinkDigit, bool blinkState) {
       dateDisplay.setDigit(0, i, digits[i], false);
   }
 }
+unsigned long tScroll = 0;
 void scrollingDot() {
-  scrollDot_No++;
-  clearTime();
-  if (scrollDot_No > 5) scrollDot_No = 0;
-  switch (scrollDot_No) {
+  if (millis() - tScroll >= 200)
+  {
+    tScroll = millis();
+    scrollDot_No++;
+    clearTime();
+    if (scrollDot_No > 5)
+      scrollDot_No = 0;
+    switch (scrollDot_No)
+    {
     case 0:
       dateDisplay.setChar(0, 5, ' ', false);
       dateDisplay.setChar(0, 0, '.', false);
@@ -176,6 +182,7 @@ void scrollingDot() {
       dateDisplay.setChar(0, 4, ' ', false);
       dateDisplay.setChar(0, 5, '.', false);
       break;
+    }
   }
 }
 

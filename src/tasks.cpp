@@ -28,6 +28,17 @@ void runRTCTask()
         colon = !colon;
     }
 }
+void getLocalESPTime(int* tempTime)
+{
+  // int *tempTime = new int[6];
+  tempTime[0] = h;
+  tempTime[1] = m;
+  tempTime[2] = s;
+  tempTime[3] = d;
+  tempTime[4] = mo;
+  tempTime[5] = y;
+  // return tempTime;
+}
 
 void runDisplayTask()
 {

@@ -2,6 +2,7 @@
 #define BUZZER_H
 
 void initBuzzer();
+void buttonBeep();
 void runBuzzerTask();
 
 void buttonBeep();

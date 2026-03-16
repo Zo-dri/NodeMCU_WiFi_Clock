@@ -1,5 +1,6 @@
 #include <RTClib.h>
 #include "buttons.h"
+#include "buzzer.h"
 #include "display.h"
 #include "menu.h"
 #include "rtc.h"
@@ -172,6 +173,10 @@ void runMenu() {
   updateBlink();
   Button b = getButtonEvent();
 
+  if (b != BTN_NONE)
+  {
+    buttonBeep();
+  }
   printButtonState(b);
 
   int h, m, s, d, mo, y;

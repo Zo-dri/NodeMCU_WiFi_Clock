@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiManager.h>
+#include "buzzer.h"
 #include "core_esp8266_features.h"
 #include "display.h"
 #include "HardwareSerial.h"
@@ -53,7 +54,8 @@ bool initWiFi() {
   while (WiFi.status() != WL_CONNECTED && ((millis() - tCaptivePortal) / 1000) < PORTAL_TIMEOUT)
   {
     wm.process();
-    delay(200);
+    runBuzzerTask();
+    // delay(200);
     scrollingDot();
   }
   // if (WiFi.status() != WL_CONNECTED) {

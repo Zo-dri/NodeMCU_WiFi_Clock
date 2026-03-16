@@ -7,4 +7,6 @@ void runNTPTask();
 void runBrightnessTask();
 void runButtonTask();
 
+void getLocalESPTime(int *tempTime);
+
 #endif
