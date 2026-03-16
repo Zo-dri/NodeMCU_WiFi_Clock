@@ -8,10 +8,12 @@
 #include "wl_definitions.h"
 
 #define WIFI_TIMEOUT  10
+#define WIFI_RETRIES 2
 #define PORTAL_TIMEOUT 180
 
-void updateRTConConnect()
+bool updateRTConConnect()
 {
+  WiFiManager wm;
   Serial.println("Updating time from NTP");
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -26,11 +28,18 @@ void updateRTConConnect()
     }
     Serial.println("RTC: Time Updated Successfully.");
   }
-  WiFi.disconnect(true);
+  else
+  {
+    Serial.print("Wifi not connected");
+    return false;
+  }
+  // WiFi.disconnect(true);
+  wm.disconnect();
   Serial.println("WiFi Disconnected");
+  return true;
 }
 unsigned long tCaptivePortal;
-void initWiFi() {
+bool initWiFi() {
   tCaptivePortal = millis();
 
   WiFiManager wm;
@@ -50,7 +59,11 @@ void initWiFi() {
   // if (WiFi.status() != WL_CONNECTED) {
   // }
 
-  updateRTConConnect();
+  return updateRTConConnect();
+  // Serial.println("Stopping AP and Portal");
+  // wm.stopConfigPortal();
+  // Serial.println("Stopping portal");
+  // wm.stopWebPortal();
   if (!res)
   {
     Serial.println("Restarting Clock");
@@ -58,7 +71,7 @@ void initWiFi() {
   }
 }
 unsigned long tWifiConnect;
-void useWiFi()
+bool useWiFi()
 {
   tWifiConnect = millis();
   WiFiManager wm;
@@ -67,6 +80,8 @@ void useWiFi()
   wm.setConfigPortalTimeout(PORTAL_TIMEOUT);
 
   wm.setConfigPortalBlocking(false);
+  wm.setDisableConfigPortal(true);
+  wm.setConnectRetries(WIFI_RETRIES);
   bool res = wm.autoConnect("Clock_Setup");
 
   while (WiFi.status() != WL_CONNECTED && ((millis() - tWifiConnect) / 1000) < WIFI_TIMEOUT)
@@ -75,13 +90,17 @@ void useWiFi()
     delay(200);
     scrollingDot();
   }
-  updateRTConConnect();
-  if (!res)
-    return;
+  return updateRTConConnect();
 }
 
 void resetWifi() {
   WiFiManager wm;
   wm.resetSettings();
   // ESP.restart();
+}
+
+bool isWifiSaved()
+{
+  WiFiManager wm;
+  return wm.getWiFiIsSaved();
 }

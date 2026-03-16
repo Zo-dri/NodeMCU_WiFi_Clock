@@ -1,9 +1,9 @@
 #ifndef WIFI_CLOCK_H
 #define WIFI_CLOCK_H
 
-void initWiFi();
-void useWiFi();
+bool initWiFi();
+bool useWiFi();
 void resetWifi();
-void runWiFiAnimation();
+bool isWifiSaved();
 
 #endif

@@ -215,9 +215,9 @@ void runMenu() {
     case MAIN_MENU:
     {
       if (b == BTN_UP)
-        menuIndex--;
-      if (b == BTN_DOWN)
         menuIndex++;
+      if (b == BTN_DOWN)
+        menuIndex--;
 
       menuIndex = loopValue(menuIndex, 0, 5);
       // if (menuIndex < 0)
@@ -287,10 +287,10 @@ void runMenu() {
         setBrightDisplay(editBrightness, blinkState);
         break;
       case 4:
-        setWifiDisplay(0);
+        connectWifiDisplay(blinkState);
         break;
       case 5:
-        setWifiDisplay(1);
+        resetWifiDisplay(blinkState);
         break;
       default:
         break;
@@ -480,14 +480,45 @@ void runMenu() {
     }
     case SET_WIFI:
     {
-      useWiFi();
+      if (!isWifiSaved())
+      {
+        setTimeDisplay("no  ");
+        setDateDisplay("ap set");
+        delay(2000);
+        state = CLOCK_VIEW;
+        break;
+      }
+      if (!useWiFi())
+      {
+        setTimeDisplay("noap");
+        setDateDisplay("found ");
+        delay(2000);
+      }
+      else
+      {
+        clearTime();
+        setDateDisplay("succes");
+        delay(2000);
+      }
       state = CLOCK_VIEW;
       break;
     }
     case RESET_WIFI:
     {
       resetWifi();
-      initWiFi();
+      if (!initWiFi())
+      {
+        setTimeDisplay("not ");
+        setDateDisplay(" set  ");
+        delay(2000);
+      }
+      else
+      {
+        clearTime();
+        setDateDisplay("succes");
+        delay(2000);
+      }
+      state = CLOCK_VIEW;
       break;
     }
     }

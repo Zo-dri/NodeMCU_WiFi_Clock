@@ -95,6 +95,7 @@ Button getButtonEvent()
 
   return BTN_NONE;
 }
+
 /*
 Button getButtonEvent() {
   static Button lastButton = BTN_NONE;
@@ -128,6 +129,7 @@ Button getButtonEvent() {
   return BTN_NONE;
 }
 */
+
 void printButtonState(Button b)
 {
   if (b == BTN_UP)

@@ -11,10 +11,12 @@ LedControl timeDisplay = LedControl(DIN, CLK, CS_TIME, 1);
 LedControl dateDisplay = LedControl(DIN, CLK, CS_DATE, 1);
 
 byte scrollDot_No = 0;
-byte last_h, last_m, last_s;
+byte last_h, last_m, last_s, last_dd, last_mm, last_yyyy;
 
-void prettyPrintTime(int h, int m, int s) {
+void prettyPrintTime(int h, int m, int s)
+{
   if (h != last_h || m != last_m || s != last_s) {
+    Serial.print("Time: ");
     last_h = h, last_m = m, last_s = s;
     if (h < 10) Serial.print("0");
     Serial.print(h);
@@ -24,6 +26,22 @@ void prettyPrintTime(int h, int m, int s) {
     Serial.print(":");
     if (s < 10) Serial.print("0");
     Serial.print(s);
+    Serial.println();
+  }
+}
+void prettyPrintDate(int dd, int mm, int yyyy)
+{
+  if (dd != last_dd || mm != last_mm || yyyy != last_yyyy) {
+    Serial.print("Date: ");
+    last_dd = dd, last_mm = mm, last_yyyy = yyyy;
+    if (dd < 10) Serial.print("0");
+    Serial.print(dd);
+    Serial.print("-");
+    if (mm < 10) Serial.print("0");
+    Serial.print(mm);
+    Serial.print("-");
+    if (yyyy < 10) Serial.print("0");
+    Serial.print(yyyy);
     Serial.println();
   }
 }
@@ -131,6 +149,7 @@ void showDateEdit(int d, int m, int y, int blinkDigit, bool blinkState) {
 }
 void scrollingDot() {
   scrollDot_No++;
+  clearTime();
   if (scrollDot_No > 5) scrollDot_No = 0;
   switch (scrollDot_No) {
     case 0:
@@ -158,10 +177,6 @@ void scrollingDot() {
       dateDisplay.setChar(0, 5, '.', false);
       break;
   }
-}
-
-void setwifi(){
-  // timeDisplay.setChar(0, 0, '')
 }
 
 void set24H(int display, bool blinkState)
@@ -254,7 +269,7 @@ byte alphabets[27] = {
 
 /**
  * Display the english alphabet in a 7-segment display.
- * 
+ *
  * Params
  * index: position of the character in the display (0...7)
  * value: the character to display
@@ -314,8 +329,29 @@ void setDateDisplay(String displayString)
 }
 void setWifiDisplay(int value)
 {
-  // clearTime();
   setTimeDisplay("ap  ");
   setDateDisplay("reset");
   dateDisplay.setDigit(0, 5, value, false);
+}
+void connectWifiDisplay(bool blinkState)
+{
+  if (!blinkState)
+  {
+    clearDate();
+    clearTime();
+    return;
+  }
+  setTimeDisplay("ap  ");
+  setDateDisplay("connec");
+}
+void resetWifiDisplay(bool blinkState)
+{
+  if (!blinkState)
+  {
+    clearDate();
+    clearTime();
+    return;
+  }
+  setTimeDisplay("ap  ");
+  setDateDisplay("reset ");
 }

@@ -2,6 +2,7 @@
 .prettierrc
 .editorconfig
 .pio
+Feature_Clock.ino.cpp
 
 # Prerequisites
 *.d

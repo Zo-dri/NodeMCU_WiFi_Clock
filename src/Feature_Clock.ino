@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "buttons.h"
+#include "buzzer.h"
 #include "display.h"
 #include "menu.h"
 #include "ntp.h"
@@ -12,6 +13,7 @@ void setup() {
   Serial.println();
 
   initDisplay();
+  initBuzzer();
   initRTC();
   // initWiFi();
   initNTP();
@@ -33,6 +35,7 @@ void loop() {
   }
   runRTCTask();
   runDisplayTask();
+  // runBuzzerTask();
   runBrightnessTask();
   runButtonTask();
   runMenu();
