@@ -34,6 +34,15 @@ void buttonBeep()
   lastToggle = millis();
 }
 
+void silencio()
+{
+  uiBeep = false;
+  remainingBeeps = 0;
+  toneState = false;
+  buzzing = false;
+  digitalWrite(BUZZER_PIN, LOW);
+}
+
 void runBuzzerTask()
 {
   int hour,  minute,  second;
@@ -43,7 +52,7 @@ void runBuzzerTask()
   minute = localTime[1];
   second = localTime[2];
 
-  prettyPrintTime(hour, minute, second);
+  // prettyPrintTime(hour, minute, second);
 
   unsigned long now = millis();
 

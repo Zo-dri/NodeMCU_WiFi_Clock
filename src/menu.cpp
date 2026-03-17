@@ -3,6 +3,7 @@
 #include "buzzer.h"
 #include "display.h"
 #include "menu.h"
+#include "preferences.h"
 #include "rtc.h"
 #include "wifi.h"
 #include "WString.h"
@@ -160,7 +161,9 @@ int setCustomBrightness(int level)
   return useBrightness;
 }
 
-void initMenu() {}
+void initMenu() {
+  use24H = prefs.use24Hour;
+}
 
 void updateBlink() {
   if (millis() - blinkTimer > 500) {
@@ -445,6 +448,11 @@ void runMenu() {
       {
         menuIndex = 2;
         use24H = edit24H;
+        if (use24H != prefs.use24Hour)
+        {
+          prefs.use24Hour = use24H;
+          savePreferences();
+        }
         state = MAIN_MENU;
       }
       if (b == BTN_BACK)
@@ -493,6 +501,9 @@ void runMenu() {
         state = CLOCK_VIEW;
         break;
       }
+      silencio();
+      setTimeDisplay("ap  ");
+      setDateDisplay("trying");
       if (!useWiFi())
       {
         setTimeDisplay("noap");
@@ -505,12 +516,14 @@ void runMenu() {
         setDateDisplay("succes");
         delay(2000);
       }
+      buttonBeep();
       state = CLOCK_VIEW;
       break;
     }
     case RESET_WIFI:
     {
       resetWifi();
+      silencio();
       if (!initWiFi())
       {
         setTimeDisplay("not ");
@@ -523,6 +536,7 @@ void runMenu() {
         setDateDisplay("succes");
         delay(2000);
       }
+      buttonBeep();
       state = CLOCK_VIEW;
       break;
     }

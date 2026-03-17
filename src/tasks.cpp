@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "tasks.h"
 #include "buttons.h"
+#include "preferences.h"
 #include "rtc.h"
 #include "display.h"
 #include "menu.h"
@@ -78,9 +79,9 @@ void runBrightnessTask()
         tBrightness = millis();
 
         if (h >= 22 || h < 7)
-            setBrightness(setCustomBrightness(2)); // night mode
+          setBrightness(setCustomBrightness(prefs.brightnessNight)); // night mode
         else
-            setBrightness(getCustomBrightness()); // daytime
+          setBrightness(setCustomBrightness(prefs.brightnessDay)); // daytime
     }
 }
 

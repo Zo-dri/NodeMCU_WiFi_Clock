@@ -153,7 +153,7 @@ void scrollingDot() {
   {
     tScroll = millis();
     scrollDot_No++;
-    clearTime();
+    setTimeDisplay("AP  ");
     if (scrollDot_No > 5)
       scrollDot_No = 0;
     switch (scrollDot_No)
