@@ -19,6 +19,9 @@ String MenuStateName[Num_MenuState] = {"CLOCK_VIEW", "MAIN_MENU", "SET_HOUR",
 // Loops from high to low on overflow and vice-versa
 #define loopValue(amt, low, high) ((amt) < (low) ? (high) : ((amt) > (high) ? (low) : (amt)))
 
+#define MENU_TIMEOUT 15000
+static unsigned long lastInteraction = 0;
+
 int menuIndex = 0;
 
 int editHour, lastEditHour;
@@ -185,13 +188,21 @@ void runMenu() {
   if (b != BTN_NONE)
   {
     buttonBeep();
+    lastInteraction = millis();
   }
   printButtonState(b);
 
+  if (state != CLOCK_VIEW)
+  {
+    if (millis() - lastInteraction > MENU_TIMEOUT)
+    {
+      state = CLOCK_VIEW;
+      return;
+    }
+  }
   int h, m, s, d, mo, y;
 
   // printStatePretty(0);
-
   switch (state)
   {
   case CLOCK_VIEW:
