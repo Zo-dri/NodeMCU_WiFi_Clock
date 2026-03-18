@@ -79,9 +79,9 @@ void runBrightnessTask()
         tBrightness = millis();
 
         if (h >= 22 || h < 7)
-          setBrightness(setCustomBrightness(prefs.brightnessNight)); // night mode
+          setBrightness(getCustomBrightnessNight()); // night mode
         else
-          setBrightness(setCustomBrightness(prefs.brightnessDay)); // daytime
+          setBrightness(getCustomBrightnessDay()); // daytime
     }
 }
 

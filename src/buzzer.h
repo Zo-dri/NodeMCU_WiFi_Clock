@@ -3,6 +3,7 @@
 
 void initBuzzer();
 void buttonBeep();
+void longBeep();
 void silencio();
 void runBuzzerTask();
 

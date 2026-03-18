@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
+#include "buzzer.h"
 #include "preferences.h"
 
 #define EEPROM_SIZE 128
@@ -63,6 +64,7 @@ void savePreferences()
 {
   EEPROM.put(0, prefs);
   EEPROM.commit();
+  longBeep();
   printPrefrences();
   Serial.println("Preferences Saved");
 }

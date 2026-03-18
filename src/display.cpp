@@ -212,7 +212,7 @@ void set24H(int display, bool blinkState)
   }
   clearDate();
 }
-void setBrightDisplay(int value, bool blinkState)
+void setBrightDisplay(bool display, int value, bool blinkState)
 {
   int digits[2] = {
       value / 10,
@@ -227,9 +227,15 @@ void setBrightDisplay(int value, bool blinkState)
 
   timeDisplay.setChar(0, 0, 'B', false);
   timeDisplay.setChar(0, 1, ' ', false);
+  // setTimeDisplay("B ");
   timeDisplay.setDigit(0, 2, digits[0], false);
   timeDisplay.setDigit(0,3, digits[1], false );
-  clearDate();
+  if (!display) {
+    setDateDisplay(" day  ");
+  } else {
+    setDateDisplay(" night");
+  }
+  // clearDate();
 }
 
 /**

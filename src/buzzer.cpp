@@ -9,8 +9,10 @@
 #define BEEP_LENGTH 700
 #define BEEP_GAP 300
 #define BUTTON_BEEP 120
+#define LONG_BEEP 1000
 
 static bool uiBeep = false;
+static bool lBeep = false;
 
 static bool buzzing = false;
 static int remainingBeeps = 0;
@@ -30,13 +32,23 @@ void initBuzzer()
 void buttonBeep()
 {
   digitalWrite(BUZZER_PIN, HIGH);
-  uiBeep = true;
+  if (!lBeep)
+    uiBeep = true;
+  lastToggle = millis();
+}
+
+void longBeep()
+{
+  digitalWrite(BUZZER_PIN, HIGH);
+  lBeep = true;
+  uiBeep = false;
   lastToggle = millis();
 }
 
 void silencio()
 {
   uiBeep = false;
+  lBeep = false;
   remainingBeeps = 0;
   toneState = false;
   buzzing = false;
@@ -57,6 +69,15 @@ void runBuzzerTask()
   unsigned long now = millis();
 
   // ---- handle UI beep ----
+  if (lBeep)
+  {
+    if (now - lastToggle > LONG_BEEP)
+    {
+      digitalWrite(BUZZER_PIN, LOW);
+      lBeep = false;
+    }
+    return;
+  }
   if (uiBeep)
   {
     if (now - lastToggle > BUTTON_BEEP)
@@ -88,9 +109,10 @@ void runBuzzerTask()
     Serial.print("Half-Hourly chime");
     lastHalfHour = hour;
 
-    remainingBeeps = 1;
-    buzzing = true;
-    toneState = false;
+    // remainingBeeps = 1;
+    // buzzing = true;
+    // toneState = false;
+    lBeep = true;
   }
 
   // ---- run beeper ----

@@ -31,7 +31,7 @@ void setDateDisplay(String displayString);
  * blinkState: whether the display is on or off
  */
 void set24H(int display, bool blinkState);
-void setBrightDisplay(int value, bool blinkState);
+void setBrightDisplay(bool display, int value, bool blinkState);
 void setWifiDisplay(int value);
 void connectWifiDisplay(bool blinkState);
 void resetWifiDisplay(bool blinkState);

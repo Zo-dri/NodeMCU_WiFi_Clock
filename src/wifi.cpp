@@ -55,7 +55,6 @@ bool initWiFi() {
   {
     wm.process();
     runBuzzerTask();
-    // delay(200);
     scrollingDot();
   }
   // if (WiFi.status() != WL_CONNECTED) {
@@ -89,7 +88,6 @@ bool useWiFi()
   while (WiFi.status() != WL_CONNECTED && ((millis() - tWifiConnect) / 1000) < WIFI_TIMEOUT)
   {
     wm.process();
-    delay(200);
     scrollingDot();
   }
   return updateRTConConnect();
