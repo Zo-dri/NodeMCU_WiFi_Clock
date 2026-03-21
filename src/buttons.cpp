@@ -96,40 +96,6 @@ Button getButtonEvent()
   return BTN_NONE;
 }
 
-/*
-Button getButtonEvent() {
-  static Button lastButton = BTN_NONE;
-  static unsigned long pressTime = 0;
-  static unsigned long repeatTimer = 0;
-
-  Button b = readButtonRaw();
-  unsigned long now = millis();
-
-  if (b != lastButton) {
-    lastButton = b;
-
-    if (b != BTN_NONE) {
-      pressTime = now;
-      repeatTimer = now;
-      return b;  // first press
-    }
-
-    return BTN_NONE;
-  }
-
-  if (b != BTN_NONE) {
-    if (now - pressTime > HOLD_DELAY) {
-      if (now - repeatTimer > REPEAT_RATE) {
-        repeatTimer = now;
-        return b;  // repeating event
-      }
-    }
-  }
-
-  return BTN_NONE;
-}
-*/
-
 void printButtonState(Button b)
 {
   if (b == BTN_UP)

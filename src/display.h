@@ -32,6 +32,10 @@ void setDateDisplay(String displayString);
  */
 void set24H(int display, bool blinkState);
 void setBrightDisplay(bool display, int value, bool blinkState);
+
+void setAlarmDisplay(int index, bool blinkState);
+void editAlarmDisplay(int index, bool enState, bool enBlinkState);
+
 void setWifiDisplay(int value);
 void connectWifiDisplay(bool blinkState);
 void resetWifiDisplay(bool blinkState);

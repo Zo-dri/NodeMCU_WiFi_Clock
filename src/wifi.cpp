@@ -84,7 +84,9 @@ bool useWiFi()
   wm.setDisableConfigPortal(true);
   wm.setConnectRetries(WIFI_RETRIES);
   bool res = wm.autoConnect("Clock_Setup");
-
+  if (res)
+  {
+  }
   while (WiFi.status() != WL_CONNECTED && ((millis() - tWifiConnect) / 1000) < WIFI_TIMEOUT)
   {
     wm.process();

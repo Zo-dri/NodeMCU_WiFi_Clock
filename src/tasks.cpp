@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "alarm.h"
 #include "tasks.h"
 #include "buttons.h"
 #include "preferences.h"
@@ -87,22 +88,38 @@ void runBrightnessTask()
 
 void runButtonTask()
 {
-    if (millis() - tButtons >= 20)
+  if (millis() - tButtons >= 20)
+  {
+    tButtons = millis();
+
+    Button b = getButtonEvent();
+    if (b != BTN_NONE)
     {
-        tButtons = millis();
-
-        Button b = getButtonEvent();
-
-        if (b == BTN_UP)
-            Serial.println("UP");
-
-        if (b == BTN_DOWN)
-            Serial.println("DOWN");
-
-        if (b == BTN_SELECT)
-            Serial.println("SELECT");
-
-        if (b == BTN_BACK)
-            Serial.println("BACK");
+      stopAlarm();
     }
+    if (b == BTN_UP)
+    {
+      Serial.println("UP");
+    }
+
+    if (b == BTN_DOWN)
+    {
+      Serial.println("DOWN");
+    }
+
+    if (b == BTN_SELECT)
+    {
+      Serial.println("SELECT");
+    }
+
+    if (b == BTN_BACK)
+    {
+      Serial.println("BACK");
+    }
+  }
+}
+
+void runAlarmTask()
+{
+  runAlarm(h, m, s);
 }

@@ -2,6 +2,12 @@
 #define PREFERENCES_H
 #include <Arduino.h>
 
+struct Alarm
+{
+  bool enabled;
+  uint8_t hour;
+  uint8_t minute;
+};
 struct Preferences
 {
   byte version;
@@ -15,6 +21,9 @@ struct Preferences
 
   uint8_t brightnessDay;
   uint8_t brightnessNight;
+
+  Alarm alarm1;
+  Alarm alarm2;
 
   uint32_t magic;
 };

@@ -340,6 +340,72 @@ void setDateDisplay(String displayString)
     setCharacterDate(i, displayString.charAt(i));
   }
 }
+
+void setAlarmDisplay(int index, bool blinkState)
+{
+  clearTime();
+  if (!blinkState)
+  {
+    clearDate();
+    return;
+  }
+
+  switch (index)
+  {
+  case 0:
+    if (blinkState)
+    {
+      setDateDisplay("ala");
+      dateDisplay.setDigit(0, 5, 1, false);
+    }
+    break;
+  case 1:
+    if (blinkState)
+    {
+      setDateDisplay("ala");
+      dateDisplay.setDigit(0, 5, 2, false);
+    }
+    break;
+
+  default:
+    break;
+  }
+}
+void editAlarmDisplay(int index, bool enState, bool enBlinkState)
+{
+  setDateDisplay("ala");
+  switch (index)
+  {
+  case 0:
+    dateDisplay.setDigit(0, 3, 1, false);
+    break;
+
+  case 1:
+    dateDisplay.setDigit(0, 3, 2, false);
+    break;
+
+  default:
+    break;
+  }
+
+  if (enBlinkState)
+  {
+    setCharacterDate(4, ' ');
+    setCharacterDate(5, ' ');
+    return;
+  }
+  if (enState)
+  {
+    setCharacterDate(4, 'o');
+    setCharacterDate(5, 'n');
+  }
+  else
+  {
+    setCharacterDate(4, 'o');
+    setCharacterDate(5, 'f');
+  }
+}
+
 void setWifiDisplay(int value)
 {
   setTimeDisplay("ap  ");

@@ -13,22 +13,28 @@ MenuState lastState = MAIN_MENU;
 
 String MenuStateName[Num_MenuState] = {"CLOCK_VIEW", "MAIN_MENU", "SET_HOUR",
                                        "SET_MINUTE", "SET_DAY", "SET_MONTH",
-                                       "SET_YEAR", "H24_SET", "SET_BRIGHT_DAY",
-                                       "SET_BRIGHT_NIGHT", "SET_WIFI", "RESET_WIFI"};
+                                       "SET_YEAR", "SET_ALARM", "SET_ALARM_ENABLE",
+                                       "SET_ALARM_HOUR", "SET_ALARM_MINUTE", "H24_SET",
+                                       "SET_BRIGHT_DAY", "SET_BRIGHT_NIGHT", "SET_WIFI",
+                                       "RESET_WIFI"};
 
 // Loops from high to low on overflow and vice-versa
 #define loopValue(amt, low, high) ((amt) < (low) ? (high) : ((amt) > (high) ? (low) : (amt)))
 
-#define MENU_TIMEOUT 15000
+#define MENU_TIMEOUT 30000
 static unsigned long lastInteraction = 0;
 
 int menuIndex = 0;
+int alarmIndex = 0;
 
 int editHour, lastEditHour;
 int editMinute, lastEditMinute;
 int editDay, lastEditDay;
 int editMonth, lastEditMonth;
 int editYear, lastEditYear;
+int editAlarmHour, lastEditAlarmHour;
+int editAlarmMinute, lastEditAlarmMinute;
+int editAlarmEnabled, lastEditAlarmEnable;
 
 unsigned long blinkTimer = 0;
 bool blinkState = true;
@@ -218,9 +224,11 @@ void runMenu() {
       editDay = d, lastEditDay = editDay;
       editMonth = mo, lastEditMonth = editMonth;
       editYear = y, lastEditYear = editYear;
+
       edit24H = use24H;
       editBrightnessDay = prefs.brightnessDay;
       editBrightnessNight = prefs.brightnessNight;
+
       Serial.println();
       Serial.print(editHour);
       Serial.print(":");
@@ -245,7 +253,7 @@ void runMenu() {
       if (b == BTN_DOWN)
         menuIndex--;
 
-      menuIndex = loopValue(menuIndex, 0, 6);
+      menuIndex = loopValue(menuIndex, 0, 7);
 
       if (b == BTN_BACK)
       {
@@ -256,25 +264,46 @@ void runMenu() {
         switch (menuIndex)
         {
         case 0:
+        {
           state = SET_HOUR;
           break;
+        }
         case 1:
+        {
           state = SET_DAY;
           break;
+        }
         case 2:
+        {
+          state = SET_ALARM;
+          alarmIndex = 0;
+          break;
+        }
+        case 3:
+        {
           state = H24_SET;
           break;
-        case 3:
+        }
+        case 4:
+        {
           state = SET_BRIGHT_DAY;
           break;
-        case 4:
+        }
+        case 5:
+        {
           state = SET_BRIGHT_NIGHT;
           break;
-        case 5:
+        }
+        case 6:
+        {
           state = SET_WIFI;
           break;
-        case 6:
+        }
+        case 7:
+        {
           state = RESET_WIFI;
+          break;
+        }
         default:
           break;
         }
@@ -283,6 +312,7 @@ void runMenu() {
       switch (menuIndex)
       {
       case 0:
+      {
         if (blinkState)
         {
           showTime(editHour, editMinute, 0, true);
@@ -293,8 +323,10 @@ void runMenu() {
         }
         showDate(editDay, editMonth, editYear);
         break;
+      }
       case 1:
-      showTime(editHour, editMinute, 0, true);
+      {
+        showTime(editHour, editMinute, 0, true);
         if (blinkState)
         {
           showDate(editDay, editMonth, editYear);
@@ -304,21 +336,46 @@ void runMenu() {
           clearDate();
         }
         break;
+      }
       case 2:
+      {
+        if (blinkState)
+        {
+          setTimeDisplay("set ");
+          setDateDisplay(" ala  ");
+        }
+        else
+        {
+          clearTime();
+          clearDate();
+        }
+        break;
+      }
+      case 3:
+      {
         set24H(edit24H, blinkState);
         break;
-      case 3:
+      }
+      case 4:
+      {
         setBrightDisplay(0, editBrightnessDay, blinkState);
         break;
-      case 4:
+      }
+      case 5:
+      {
         setBrightDisplay(1, editBrightnessNight, blinkState);
         break;
-      case 5:
+      }
+      case 6:
+      {
         connectWifiDisplay(blinkState);
         break;
-      case 6:
+      }
+      case 7:
+      {
         resetWifiDisplay(blinkState);
         break;
+      }
       default:
         break;
       }
@@ -333,12 +390,15 @@ void runMenu() {
       if (b == BTN_DOWN)
         editHour = (editHour + 23) % 24;
 
-      if (b == BTN_SELECT)
-        state = SET_MINUTE;
       if (b == BTN_BACK)
       {
-        editHour = h;
+        editHour = lastEditHour;
         state = MAIN_MENU;
+      }
+
+      if (b == BTN_SELECT)
+      {
+        state = SET_MINUTE;
       }
 
       showTimeEdit(editHour, editMinute, 0, blinkState);
@@ -352,19 +412,19 @@ void runMenu() {
       if (b == BTN_DOWN)
         editMinute = (editMinute + 59) % 60;
 
+      if (b == BTN_BACK)
+      {
+        editMinute = lastEditMinute;
+        state = SET_HOUR;
+      }
+
       if (b == BTN_SELECT)
       {
         int d, mo, y;
         getDate(d, mo, y);
 
         setRTC(DateTime(y, mo, d, editHour, editMinute, 0).unixtime());
-        menuIndex = 0;
-        state = MAIN_MENU;
-      }
-
-      if (b == BTN_BACK)
-      {
-        editMinute = m;
+        // menuIndex = 0;
         state = MAIN_MENU;
       }
 
@@ -385,7 +445,9 @@ void runMenu() {
         editDay = 1;
 
       if (b == BTN_SELECT)
+      {
         state = SET_MONTH;
+      }
       if (b == BTN_BACK)
       {
         editDay = lastEditDay;
@@ -411,11 +473,13 @@ void runMenu() {
         editMonth = 1;
 
       if (b == BTN_SELECT)
+      {
         state = SET_YEAR;
+      }
       if (b == BTN_BACK)
       {
         editMonth = lastEditMonth;
-        state = MAIN_MENU;
+        state = SET_DAY;
       }
 
       showTime(editHour, editMinute, 0, true);
@@ -441,19 +505,198 @@ void runMenu() {
         getTime(h, m, s);
 
         setRTC(DateTime(editYear, editMonth, editDay, h, m, s).unixtime());
+        // menuIndex = 1;
         state = MAIN_MENU;
       }
 
       if (b == BTN_BACK)
       {
         editYear = lastEditYear;
-        menuIndex = 1;
-        state = MAIN_MENU;
+        // menuIndex = 1;
+        state = SET_MONTH;
       }
 
       showTime(editHour, editMinute, 0, true);
       showDateEdit(editDay, editMonth, editYear, 4, blinkState);
 
+      break;
+    }
+
+    case SET_ALARM:
+    {
+      if (b == BTN_UP)
+      {
+        alarmIndex++;
+      }
+      if (b == BTN_DOWN)
+      {
+        alarmIndex--;
+      }
+      alarmIndex = loopValue(alarmIndex, 0, 1);
+
+      if (b == BTN_BACK)
+      {
+        // menuIndex = 2;
+        state = MAIN_MENU;
+      }
+      if (b == BTN_SELECT)
+      {
+        switch (alarmIndex)
+        {
+        case 0:
+          editAlarmHour = prefs.alarm1.hour;
+          editAlarmMinute = prefs.alarm1.minute;
+          editAlarmEnabled = prefs.alarm1.enabled;
+          break;
+
+        case 1:
+          editAlarmHour = prefs.alarm2.hour;
+          editAlarmMinute = prefs.alarm2.minute;
+          editAlarmEnabled = prefs.alarm2.enabled;
+          break;
+
+        default:
+          break;
+        }
+        lastEditAlarmHour = editAlarmHour;
+        lastEditAlarmMinute = editAlarmMinute;
+        lastEditAlarmEnable = editAlarmEnabled;
+        state = SET_ALARM_ENABLE;
+      }
+
+      setAlarmDisplay(alarmIndex, blinkState);
+      break;
+    }
+    case SET_ALARM_ENABLE:
+    {
+      if (b == BTN_UP || b == BTN_DOWN)
+      {
+        editAlarmEnabled = !editAlarmEnabled;
+      }
+      if (b == BTN_BACK)
+      {
+        editAlarmEnabled = lastEditAlarmEnable;
+        state = SET_ALARM;
+      }
+      if (b == BTN_SELECT)
+      {
+        bool valueChanged = false;
+        switch (alarmIndex)
+        {
+        case 0:
+        {
+          if (editAlarmEnabled != prefs.alarm1.enabled)
+          {
+            prefs.alarm1.enabled = editAlarmEnabled;
+            valueChanged = true;
+          }
+          break;
+        }
+        case 1:
+        {
+          if (editAlarmEnabled != prefs.alarm2.enabled)
+          {
+            prefs.alarm2.enabled = editAlarmEnabled;
+            valueChanged = true;
+          }
+          break;
+        }
+        }
+        if (valueChanged)
+        {
+          savePreferences();
+        }
+        state = SET_ALARM_HOUR;
+      }
+      showTime(editAlarmHour, editAlarmMinute, 0, true);
+      editAlarmDisplay(alarmIndex, editAlarmEnabled, blinkState);
+      break;
+    }
+    case SET_ALARM_HOUR:
+    {
+      if (b == BTN_UP)
+        editAlarmHour = (editAlarmHour + 1) % 24;
+      if (b == BTN_DOWN)
+        editAlarmHour = (editAlarmHour + 23) % 24;
+
+      if (b == BTN_SELECT)
+        state = SET_ALARM_MINUTE;
+      if (b == BTN_BACK)
+      {
+        editAlarmHour = lastEditAlarmHour;
+        state = SET_ALARM_ENABLE;
+      }
+      showTimeEdit(editAlarmHour, editAlarmMinute, 0, blinkState);
+      editAlarmDisplay(alarmIndex, editAlarmEnabled, 1);
+      break;
+    }
+    case SET_ALARM_MINUTE:
+    {
+      if (b == BTN_UP)
+        editAlarmMinute = (editAlarmMinute + 1) % 60;
+      if (b == BTN_DOWN)
+        editAlarmMinute = (editAlarmMinute + 59) % 60;
+
+      if (b == BTN_BACK)
+      {
+        editAlarmMinute = lastEditAlarmMinute;
+        state = SET_ALARM_HOUR;
+      }
+
+      if (b == BTN_SELECT)
+      {
+        bool valueChanged = false;
+        switch (alarmIndex)
+        {
+        case 0:
+        {
+          if (editAlarmHour != prefs.alarm1.hour)
+          {
+            prefs.alarm1.hour = editAlarmHour;
+            valueChanged = true;
+          }
+          if (editAlarmMinute != prefs.alarm1.minute)
+          {
+            prefs.alarm1.minute = editAlarmMinute;
+            valueChanged = true;
+          }
+          if (editAlarmEnabled != prefs.alarm1.enabled)
+          {
+            prefs.alarm1.enabled = editAlarmEnabled;
+            valueChanged = true;
+          }
+          break;
+        }
+        case 1:
+        {
+          if (editAlarmHour != prefs.alarm2.hour)
+          {
+            prefs.alarm2.hour = editAlarmHour;
+            valueChanged = true;
+          }
+          if (editAlarmMinute != prefs.alarm2.minute)
+          {
+            prefs.alarm2.minute = editAlarmMinute;
+            valueChanged = true;
+          }
+          if (editAlarmEnabled != prefs.alarm2.enabled)
+          {
+            prefs.alarm2.enabled = editAlarmEnabled;
+            valueChanged = true;
+          }
+          break;
+        }
+        }
+        if (valueChanged)
+        {
+          savePreferences();
+        }
+        // menuIndex = 2;
+        state = MAIN_MENU;
+      }
+
+      showTimeEdit(editAlarmHour, editAlarmMinute, 2, blinkState);
+      editAlarmDisplay(alarmIndex, editAlarmEnabled, 1);
       break;
     }
 
@@ -465,7 +708,7 @@ void runMenu() {
       }
       if (b == BTN_SELECT)
       {
-        menuIndex = 2;
+        // menuIndex = 2;
         use24H = edit24H;
         if (use24H != prefs.use24Hour)
         {
@@ -476,7 +719,7 @@ void runMenu() {
       }
       if (b == BTN_BACK)
       {
-        menuIndex = 2;
+        // menuIndex = 2;
         edit24H = use24H;
         state = MAIN_MENU;
       }
@@ -501,13 +744,13 @@ void runMenu() {
           prefs.brightnessDay = editBrightnessDay;
           savePreferences();
         }
-        menuIndex = 3;
+        // menuIndex = 3;
         state = MAIN_MENU;
       }
       if (b == BTN_BACK)
       {
         editBrightnessDay = useBrightnessDay;
-        menuIndex = 3;
+        // menuIndex = 3;
         state = MAIN_MENU;
       }
       editBrightnessDay = constrain(editBrightnessDay, 1, 15);
@@ -535,19 +778,20 @@ void runMenu() {
           prefs.brightnessNight = editBrightnessNight;
           savePreferences();
         }
-        menuIndex = 4;
+        // menuIndex = 4;
         state = MAIN_MENU;
       }
       if (b == BTN_BACK)
       {
         editBrightnessNight = useBrightnessNight;
-        menuIndex = 4;
+        // menuIndex = 4;
         state = MAIN_MENU;
       }
       setBrightness(editBrightnessNight);
       setBrightDisplay(1, editBrightnessNight, true);
       break;
     }
+
     case SET_WIFI:
     {
       if (!isWifiSaved())
@@ -597,5 +841,7 @@ void runMenu() {
       state = CLOCK_VIEW;
       break;
     }
+    default:
+      break;
     }
 }

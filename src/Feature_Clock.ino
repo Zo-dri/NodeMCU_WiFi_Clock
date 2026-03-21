@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "alarm.h"
 #include "buttons.h"
 #include "buzzer.h"
 #include "display.h"
@@ -39,6 +40,7 @@ void loop() {
   runBuzzerTask();
   runBrightnessTask();
   runButtonTask();
+  runAlarmTask();
   runMenu();
   runNTPTask();
 }
